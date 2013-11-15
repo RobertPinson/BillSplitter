@@ -3,6 +3,14 @@
 
     <string name="app_name">Split A Bill</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="total_hint">00.00</string>
+    <string name="bill_total">Bill Total</string>
+    <string name="button_plus">+</string>
+    <string name="button_minus">-</string>
+    <string name="bill_splitby">Split By</string>
+    <string name="split_default">00</string>
+
+    <color name="background">#78BCBC</color>
+    <color name="white">#FFFFFF</color>
 
 </resources>
