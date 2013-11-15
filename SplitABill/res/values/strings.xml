@@ -7,7 +7,7 @@
     <string name="bill_total">Bill Total</string>
     <string name="button_plus">+</string>
     <string name="button_minus">-</string>
-    <string name="bill_splitby">Split By</string>
+    <string name="bill_splitby">Split Between</string>
     <string name="split_default">00</string>
 
     <color name="background">#78BCBC</color>
