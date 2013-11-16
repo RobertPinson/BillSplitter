@@ -15,12 +15,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class SplitABillActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_splitabill);
 
 		final EditText total = (EditText) findViewById(R.id.total_value);
 		total.addTextChangedListener(new TextWatcher() {

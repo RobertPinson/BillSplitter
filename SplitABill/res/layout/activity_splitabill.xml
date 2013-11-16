@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    tools:context=".SplitABillActivity" >
 
     <TextView
         android:id="@+id/bill_total"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="splitMinus"
-            android:background="@color/background"
+            android:background="@drawable/btn_split"
             android:text="@string/button_minus" />
 
         <TextView
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:onClick="splitPlus"
-            android:background="@color/background"
+            android:background="@drawable/btn_split"
             android:text="@string/button_plus" />
 
     </LinearLayout>
