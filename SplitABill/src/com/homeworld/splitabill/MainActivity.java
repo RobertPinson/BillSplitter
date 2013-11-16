@@ -23,49 +23,51 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		final EditText total = (EditText) findViewById(R.id.total_value);
-		total.addTextChangedListener(new TextWatcher() {		
+		total.addTextChangedListener(new TextWatcher() {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {				
-				String digits = s.toString().replaceAll("[£,.]", "");
-				
-				if (digits.length() <= 0)
-				{
+					int count) {
+				Currency currency = Currency.getInstance(Locale.getDefault());
+				String digits = s.toString().replaceAll(
+						String.format("[%s,.]", currency.getSymbol()), "");
+
+				if (digits.length() <= 0) {
 					return;
 				}
-				
-		        NumberFormat nf = NumberFormat.getCurrencyInstance();
 
-		        try{
-		            String formatted = nf.format(Double.parseDouble(digits)/100);
-		            total.removeTextChangedListener(this);
-		            total.setText(formatted);
-		            total.setSelection(formatted.length());
-		            total.addTextChangedListener(this);
-		            
-		            TextView splitBy = (TextView) findViewById(R.id.edit_splitby);
-					int split = Integer.parseInt(splitBy.getText().toString());					
+				NumberFormat nf = NumberFormat.getCurrencyInstance();
+
+				try {
+					String formatted = nf.format(Double.parseDouble(digits) / 100);
+					total.removeTextChangedListener(this);
+					total.setText(formatted);
+					total.setSelection(formatted.length());
+					total.addTextChangedListener(this);
+
+					TextView splitBy = (TextView) findViewById(R.id.edit_splitby);
+					int split = Integer.parseInt(splitBy.getText().toString());
+
+					BigDecimal totalValue = new BigDecimal(
+							CurrencyStringClean(formatted));
+
 					
-					BigDecimal totalValue = new BigDecimal(CurrencyStringClean(formatted));
-
-					SplitBill(split, totalValue);
-		        } catch (NumberFormatException nfe) {
-		            //total.setText("");
-		        }
+						SplitBill(split, totalValue);
+				} catch (NumberFormatException nfe) {
+					// total.setText("");
+				}
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				
-				
+
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 	}
@@ -87,9 +89,10 @@ public class MainActivity extends Activity {
 		splitBy.setText(String.format("%02d", splitValue));
 
 		EditText billTotal = (EditText) findViewById(R.id.total_value);
-		BigDecimal total = new BigDecimal(CurrencyStringClean(billTotal.getText().toString()));
-
-		SplitBill(splitValue, total);
+		BigDecimal totalValue = new BigDecimal(CurrencyStringClean(billTotal
+				.getText().toString()));
+		if (totalValue.signum() > 0)
+			SplitBill(splitValue, totalValue);
 	}
 
 	@Override
@@ -114,9 +117,10 @@ public class MainActivity extends Activity {
 			splitBy.setText(String.format("%02d", split));
 
 			EditText billTotal = (EditText) findViewById(R.id.total_value);
-			BigDecimal total = new BigDecimal(CurrencyStringClean(billTotal.getText().toString()));
-
-			SplitBill(split, total);
+			BigDecimal totalValue = new BigDecimal(
+					CurrencyStringClean(billTotal.getText().toString()));
+			if (totalValue.signum() > 0)
+				SplitBill(split, totalValue);
 		} catch (NumberFormatException nfe) {
 			System.out.println("Could not parse " + nfe);
 		}
@@ -134,19 +138,20 @@ public class MainActivity extends Activity {
 			splitBy.setText(String.format("%02d", split));
 
 			EditText billTotal = (EditText) findViewById(R.id.total_value);
-			BigDecimal total = new BigDecimal(CurrencyStringClean(billTotal.getText().toString()));
-
-			SplitBill(split, total);
+			BigDecimal totalValue = new BigDecimal(
+					CurrencyStringClean(billTotal.getText().toString()));
+			if (totalValue.signum() > 0)
+				SplitBill(split, totalValue);
 		} catch (NumberFormatException nfe) {
 			System.out.println("Could not parse " + nfe);
 		}
 	}
-	
-	private String CurrencyStringClean(String formatted)
-	{
+
+	private String CurrencyStringClean(String formatted) {
 		Currency currency = Currency.getInstance(Locale.getDefault());
-		String digits = formatted.replaceAll(String.format("[%s,.]", currency.getSymbol()), "");
-		Double num = Double.parseDouble(digits)/100;
+		String digits = formatted.replaceAll(
+				String.format("[%s,.]", currency.getSymbol()), "");
+		Double num = Double.parseDouble(digits) / 100;
 		return num.toString();
 	}
 
@@ -156,8 +161,7 @@ public class MainActivity extends Activity {
 
 		ArrayList<BillItem> billList = new ArrayList<BillItem>();
 
-		if (split <= 0) {
-
+		if (split <= 0 || billTotal.signum() < 1) {
 			adapter = new SplitBillAdapter(this, billList);
 			listview.setAdapter(adapter);
 			return;
@@ -165,7 +169,7 @@ public class MainActivity extends Activity {
 
 		Money money = MoneyMaker.makeMoney(
 				Currency.getInstance(Locale.getDefault()), billTotal);
-		
+
 		Money[] bills = money.proRate(split);
 
 		int index = 0;
