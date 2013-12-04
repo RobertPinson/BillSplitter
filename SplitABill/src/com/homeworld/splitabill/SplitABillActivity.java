@@ -12,15 +12,39 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.google.android.gms.ads.*;
 
 public class SplitABillActivity extends Activity {
+private AdView adView;
+/* Your ad unit id. Replace with your actual ad unit id. */
+private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splitabill);
+		
+		//Create addview
+		adView = new AdView(this);
+		adView.setAdUnitId(AD_UNIT_ID);
+		adView.setAdSize(AdSize.SMART_BANNER);
+		
+		//Lookup your linearLayout
+		LinearLayout layout = (LinearLayout)findViewById(R.id.ad_banner);
+		
+		//add adView
+		layout.addView(adView);
+		
+		//initiate generic request
+		AdRequest adRequest = new AdRequest.Builder()
+		.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+		.build();
+		
+		//load adview with ad request
+		adView.loadAd(adRequest);		
 
 		final EditText total = (EditText) findViewById(R.id.total_value);
 		total.addTextChangedListener(new TextWatcher() {
@@ -67,7 +91,6 @@ public class SplitABillActivity extends Activity {
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
 				// TODO Auto-generated method stub
-
 			}
 		});
 	}
@@ -103,6 +126,24 @@ public class SplitABillActivity extends Activity {
 		TextView splitBy = (TextView) findViewById(R.id.edit_splitby);
 		int split = Integer.parseInt(splitBy.getText().toString());
 		outState.putInt("splitBy", split);
+	}
+
+	@Override
+	protected void onDestroy() {
+		adView.destroy();
+		super.onDestroy();
+	}
+
+	@Override
+	protected void onPause() {
+		adView.pause();
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {		
+		super.onResume();
+		adView.resume();
 	}
 
 	public void splitMinus(View view) {

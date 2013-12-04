@@ -14,4 +14,5 @@
     <color name="btn_down">#66A0A0</color>
     <drawable name="btn_up">#78BCBC</drawable>
 	<drawable name="btn_down">#66A0A0</drawable>
+	<color name="black">#000000</color>
 </resources>
