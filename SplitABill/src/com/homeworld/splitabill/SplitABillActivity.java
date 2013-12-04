@@ -112,8 +112,9 @@ private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144
 		splitBy.setText(String.format("%02d", splitValue));
 
 		EditText billTotal = (EditText) findViewById(R.id.total_value);
-		BigDecimal totalValue = new BigDecimal(CurrencyStringClean(billTotal
-				.getText().toString()));
+		String total = billTotal.getText().toString();
+		total = total.isEmpty() ? "£0.00" : total;
+		BigDecimal totalValue = new BigDecimal(CurrencyStringClean(total));
 		if (totalValue.signum() > 0)
 			SplitBill(splitValue, totalValue);
 	}
@@ -189,6 +190,9 @@ private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144
 	}
 
 	private String CurrencyStringClean(String formatted) {
+		if(formatted == null || formatted.isEmpty())
+			return "";
+		
 		Currency currency = Currency.getInstance(Locale.getDefault());
 		String digits = formatted.replaceAll(
 				String.format("[%s,.]", currency.getSymbol()), "");
