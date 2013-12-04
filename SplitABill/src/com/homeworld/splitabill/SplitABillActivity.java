@@ -18,33 +18,32 @@ import android.widget.TextView;
 import com.google.android.gms.ads.*;
 
 public class SplitABillActivity extends Activity {
-private AdView adView;
-/* Your ad unit id. Replace with your actual ad unit id. */
-private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144";
+	private AdView adView;
+	/* Your ad unit id. Replace with your actual ad unit id. */
+	private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splitabill);
-		
-		//Create addview
+
+		// Create addview
 		adView = new AdView(this);
 		adView.setAdUnitId(AD_UNIT_ID);
 		adView.setAdSize(AdSize.SMART_BANNER);
-		
-		//Lookup your linearLayout
-		LinearLayout layout = (LinearLayout)findViewById(R.id.ad_banner);
-		
-		//add adView
+
+		// Lookup your linearLayout
+		LinearLayout layout = (LinearLayout) findViewById(R.id.ad_banner);
+
+		// add adView
 		layout.addView(adView);
-		
-		//initiate generic request
-		AdRequest adRequest = new AdRequest.Builder()
-		.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-		.build();
-		
-		//load adview with ad request
-		adView.loadAd(adRequest);		
+
+		// initiate generic request
+		AdRequest adRequest = new AdRequest.Builder().addTestDevice(
+				AdRequest.DEVICE_ID_EMULATOR).build();
+
+		// load adview with ad request
+		adView.loadAd(adRequest);
 
 		final EditText total = (EditText) findViewById(R.id.total_value);
 		total.addTextChangedListener(new TextWatcher() {
@@ -75,8 +74,7 @@ private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144
 					BigDecimal totalValue = new BigDecimal(
 							CurrencyStringClean(formatted));
 
-					
-						SplitBill(split, totalValue);
+					SplitBill(split, totalValue);
 				} catch (NumberFormatException nfe) {
 					// total.setText("");
 				}
@@ -113,10 +111,11 @@ private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144
 
 		EditText billTotal = (EditText) findViewById(R.id.total_value);
 		String total = billTotal.getText().toString();
-		total = total.isEmpty() ? "£0.00" : total;
-		BigDecimal totalValue = new BigDecimal(CurrencyStringClean(total));
-		if (totalValue.signum() > 0)
-			SplitBill(splitValue, totalValue);
+		if (!total.isEmpty()) {
+			BigDecimal totalValue = new BigDecimal(CurrencyStringClean(total));
+			if (totalValue.signum() > 0)
+				SplitBill(splitValue, totalValue);
+		}
 	}
 
 	@Override
@@ -142,7 +141,7 @@ private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144
 	}
 
 	@Override
-	protected void onResume() {		
+	protected void onResume() {
 		super.onResume();
 		adView.resume();
 	}
@@ -190,9 +189,9 @@ private static final String AD_UNIT_ID = "ca-app-pub-7612725563518677/7747794144
 	}
 
 	private String CurrencyStringClean(String formatted) {
-		if(formatted == null || formatted.isEmpty())
+		if (formatted == null || formatted.isEmpty())
 			return "";
-		
+
 		Currency currency = Currency.getInstance(Locale.getDefault());
 		String digits = formatted.replaceAll(
 				String.format("[%s,.]", currency.getSymbol()), "");
