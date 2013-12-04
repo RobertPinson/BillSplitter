@@ -39,8 +39,10 @@ public class SplitABillActivity extends Activity {
 		layout.addView(adView);
 
 		// initiate generic request
-		AdRequest adRequest = new AdRequest.Builder().addTestDevice(
-				AdRequest.DEVICE_ID_EMULATOR).build();
+		AdRequest adRequest = new AdRequest.Builder()
+			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+			.addTestDevice("958E03A368FB270183C598920E6AE442")
+			.build();
 
 		// load adview with ad request
 		adView.loadAd(adRequest);
