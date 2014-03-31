@@ -14,7 +14,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+
 import com.google.android.gms.ads.*;
 
 public class SplitABillActivity extends Activity {
@@ -40,11 +43,10 @@ public class SplitABillActivity extends Activity {
 
 		// initiate generic request
 		AdRequest adRequest = new AdRequest.Builder()
-			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-			.addTestDevice("958E03A368FB270183C598920E6AE442")
-			.build();
+				.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+				.addTestDevice("958E03A368FB270183C598920E6AE442").build();
 
-		// load adview with ad request
+		// load add view with ad request
 		adView.loadAd(adRequest);
 
 		final EditText total = (EditText) findViewById(R.id.total_value);
@@ -93,6 +95,10 @@ public class SplitABillActivity extends Activity {
 				// TODO Auto-generated method stub
 			}
 		});
+
+		((RadioGroup) findViewById(R.id.toggleGroup))
+				.setOnCheckedChangeListener(ToggleListener);
+
 	}
 
 	@Override
@@ -101,6 +107,17 @@ public class SplitABillActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+
+	static final RadioGroup.OnCheckedChangeListener ToggleListener = new RadioGroup.OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(final RadioGroup radioGroup, final int i) {
+			for (int j = 0; j < radioGroup.getChildCount(); j++) {
+				final ToggleButton view = (ToggleButton) radioGroup
+						.getChildAt(j);
+				view.setChecked(view.getId() == i);
+			}
+		}
+	};
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -227,5 +244,21 @@ public class SplitABillActivity extends Activity {
 
 		adapter = new SplitBillAdapter(this, billList);
 		listview.setAdapter(adapter);
+	}
+
+	public void onServiceTypeChange(View view) {
+		((RadioGroup) view.getParent()).check(view.getId());
+		// app specific stuff ..
+
+		switch (view.getId()) {
+		case R.id.btn_service_value:
+			// calculate service charge by value
+
+			break;
+		case R.id.btn_service_percent:
+			// calculate service charge by percent
+
+			break;
+		}
 	}
 }

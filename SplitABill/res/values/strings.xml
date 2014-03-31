@@ -15,4 +15,7 @@
     <drawable name="btn_up">#78BCBC</drawable>
 	<drawable name="btn_down">#66A0A0</drawable>
 	<color name="black">#000000</color>
+	<string name="bill_servicecharge">Service Charge</string>
+	<string name="button_servicepercent">%</string>
+	<string name="button_servicevalue">£</string>
 </resources>
