@@ -18,4 +18,7 @@
 	<string name="bill_servicecharge">Service Charge</string>
 	<string name="button_servicepercent">%</string>
 	<string name="button_servicevalue">£</string>
+	<string name="service_hint">20</string>
+	<string name="sub_total">Subtotal</string>
+	<string name="sub_total_value">£0:00</string>
 </resources>

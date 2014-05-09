@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Locale;
 import java.math.BigDecimal;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -99,6 +100,66 @@ public class SplitABillActivity extends Activity {
 		((RadioGroup) findViewById(R.id.toggleGroup))
 				.setOnCheckedChangeListener(ToggleListener);
 
+		final EditText serviceChargeValue = (EditText) findViewById(R.id.service_value);
+		serviceChargeValue.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				ToggleButton btnPct = (ToggleButton) findViewById(R.id.btn_service_percent);
+				boolean isPercent = btnPct.isChecked();
+				EditText serviceChargeValue = (EditText) findViewById(R.id.service_value);
+
+				Currency currency = Currency.getInstance(Locale.getDefault());
+				String digits = s.toString().replaceAll(String.format("[%s,.]", currency.getSymbol()), "");
+				digits = digits.replaceAll(String.format("[%s,.]", "%"),	"");
+
+				if (digits.length() <= 0) {
+					return;
+				}
+
+				if (isPercent) {
+					// format value as percent
+					String pctFormated = String.format("%.2f %%", Double.parseDouble(digits) / 100);
+
+					serviceChargeValue.removeTextChangedListener(this);
+					serviceChargeValue.setText(pctFormated);
+					serviceChargeValue.setSelection(pctFormated.length());
+					serviceChargeValue.addTextChangedListener(this);
+				} else {
+					// format as monetary value
+					NumberFormat nf = NumberFormat.getCurrencyInstance();
+
+					try {
+						String formatted = nf.format(Double.parseDouble(digits) / 100);
+						serviceChargeValue.removeTextChangedListener(this);
+						serviceChargeValue.setText(formatted);
+						serviceChargeValue.setSelection(formatted.length());
+						serviceChargeValue.addTextChangedListener(this);
+					} catch (NumberFormatException nfe) {
+						// total.setText("");
+					}
+
+				}
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
+
+		serviceChargeValue.setText("20"); // set default service charge value
 	}
 
 	@Override
@@ -121,7 +182,6 @@ public class SplitABillActivity extends Activity {
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onRestoreInstanceState(savedInstanceState);
 
 		int splitValue = savedInstanceState.getInt("splitBy");
@@ -139,7 +199,6 @@ public class SplitABillActivity extends Activity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 
 		TextView splitBy = (TextView) findViewById(R.id.edit_splitby);
@@ -207,6 +266,28 @@ public class SplitABillActivity extends Activity {
 		}
 	}
 
+	public void onServiceTypeChange(View view) {
+		((RadioGroup) view.getParent()).check(0);
+		((RadioGroup) view.getParent()).check(view.getId());
+		EditText serviceChargeValue = (EditText) findViewById(R.id.service_value);
+		String scValue = serviceChargeValue.getText().toString();
+
+		switch (view.getId()) {
+		case R.id.btn_service_value:
+			// calculate service charge by value
+
+			// update UI
+			serviceChargeValue.setText(scValue); // update service charge value
+			break;
+		case R.id.btn_service_percent:
+			// calculate service charge by percent
+
+			// update UI
+			serviceChargeValue.setText(scValue); // set service charge
+			break;
+		}
+	}
+
 	private String CurrencyStringClean(String formatted) {
 		if (formatted == null || formatted.isEmpty())
 			return "";
@@ -244,21 +325,5 @@ public class SplitABillActivity extends Activity {
 
 		adapter = new SplitBillAdapter(this, billList);
 		listview.setAdapter(adapter);
-	}
-
-	public void onServiceTypeChange(View view) {
-		((RadioGroup) view.getParent()).check(view.getId());
-		// app specific stuff ..
-
-		switch (view.getId()) {
-		case R.id.btn_service_value:
-			// calculate service charge by value
-
-			break;
-		case R.id.btn_service_percent:
-			// calculate service charge by percent
-
-			break;
-		}
 	}
 }

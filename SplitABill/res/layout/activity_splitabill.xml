@@ -37,7 +37,9 @@
             android:layout_height="wrap_content"
             android:digits="0123456789"
             android:hint="@string/total_hint"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal" 
+            android:gravity="right"
+			android:textAlignment="gravity"/>
     </LinearLayout>
 
     <LinearLayout
@@ -63,7 +65,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:digits="0123456789"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal" 
+            android:paddingRight="20dp"
+            android:hint="@string/service_hint"/>
 
         <RadioGroup
             android:id="@+id/toggleGroup"
@@ -76,7 +80,8 @@
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="1px"
-                android:background="@drawable/btn_servicecharge"
+                android:background="@drawable/btn_service_charge"
+                android:checked="true"
                 android:onClick="onServiceTypeChange"
                 android:textOff="@string/button_servicepercent"
                 android:textOn="@string/button_servicepercent" />
@@ -85,19 +90,44 @@
                 android:id="@+id/btn_service_value"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_servicecharge"
+                android:background="@drawable/btn_service_charge"
                 android:onClick="onServiceTypeChange"
                 android:textOff="@string/button_servicevalue"
-                android:textOn="@string/button_servicevalue"                
-                android:checked="true" />
+                android:textOn="@string/button_servicevalue" />
         </RadioGroup>
+    </LinearLayout>
+    
+     <LinearLayout
+        android:id="@+id/layout_subtotal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_servicecharge"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin" >
+
+        <TextView
+            android:id="@+id/sub_total"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sub_total"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/subtotal_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.07"
+            android:text="@string/sub_total_value"
+            android:textSize="18sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layout_splitby"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/layout_servicecharge"
+        android:layout_below="@id/layout_subtotal"
         android:orientation="horizontal"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
