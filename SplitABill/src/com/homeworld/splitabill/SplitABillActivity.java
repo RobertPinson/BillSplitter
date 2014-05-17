@@ -31,7 +31,7 @@ public class SplitABillActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splitabill);
 
-		// Create addview
+		// Create ad view
 		adView = new AdView(this);
 		adView.setAdUnitId(AD_UNIT_ID);
 		adView.setAdSize(AdSize.SMART_BANNER);
@@ -108,7 +108,7 @@ public class SplitABillActivity extends Activity {
 					int count) {
 				ToggleButton btnPct = (ToggleButton) findViewById(R.id.btn_service_percent);
 				boolean isPercent = btnPct.isChecked();
-				EditText serviceChargeValue = (EditText) findViewById(R.id.service_value);
+				TextView serviceChargeTotal = (TextView) findViewById(R.id.service_charge_total);
 
 				Currency currency = Currency.getInstance(Locale.getDefault());
 				String digits = s.toString().replaceAll(String.format("[%s,.]", currency.getSymbol()), "");
@@ -120,28 +120,20 @@ public class SplitABillActivity extends Activity {
 
 				if (isPercent) {
 					// format value as percent
-					String pctFormated = String.format("%.2f %%", Double.parseDouble(digits) / 100);
-
-					serviceChargeValue.removeTextChangedListener(this);
-					serviceChargeValue.setText(pctFormated);
-					serviceChargeValue.setSelection(pctFormated.length());
-					serviceChargeValue.addTextChangedListener(this);
+					String pctFormated = String.format("%.2f %%", Double.parseDouble(digits));
+					
+					serviceChargeTotal.setText(pctFormated);
 				} else {
 					// format as monetary value
 					NumberFormat nf = NumberFormat.getCurrencyInstance();
 
 					try {
 						String formatted = nf.format(Double.parseDouble(digits) / 100);
-						serviceChargeValue.removeTextChangedListener(this);
-						serviceChargeValue.setText(formatted);
-						serviceChargeValue.setSelection(formatted.length());
-						serviceChargeValue.addTextChangedListener(this);
+						serviceChargeTotal.setText(formatted);
 					} catch (NumberFormatException nfe) {
 						// total.setText("");
 					}
-
 				}
-
 			}
 
 			@Override
