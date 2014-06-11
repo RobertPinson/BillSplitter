@@ -19,6 +19,7 @@
 	<string name="button_servicepercent">%</string>
 	<string name="button_servicevalue">£</string>
 	<string name="service_hint">20</string>
-	<string name="sub_total">Subtotal</string>
+	<string name="sub_total">Grand Total</string>
 	<string name="sub_total_value">£0:00</string>
+	<color name="main_background">#C7D4D2</color>
 </resources>

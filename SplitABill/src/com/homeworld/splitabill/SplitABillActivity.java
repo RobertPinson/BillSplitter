@@ -31,6 +31,14 @@ public class SplitABillActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splitabill);
 
+		// set list view header view
+		final ListView listview = (ListView) findViewById(R.id.listview_bills);
+		View header = getLayoutInflater().inflate(
+				R.layout.listview_bills_header, null);
+		listview.addHeaderView(header);
+
+		SplitBill(0, new BigDecimal(0));
+
 		// Create ad view
 		adView = new AdView(this);
 		adView.setAdUnitId(AD_UNIT_ID);
@@ -68,18 +76,18 @@ public class SplitABillActivity extends Activity {
 
 				try {
 					String formatted = nf.format(Double.parseDouble(digits) / 100);
+
+					BigDecimal totalValue = new BigDecimal(
+							CurrencyStringClean(formatted));
+					TextView splitBy = (TextView) findViewById(R.id.edit_splitby);
+					int split = Integer.parseInt(splitBy.getText().toString());
+					SplitBill(split, totalValue);	
+					
 					total.removeTextChangedListener(this);
 					total.setText(formatted);
 					total.setSelection(formatted.length());
 					total.addTextChangedListener(this);
 
-					TextView splitBy = (TextView) findViewById(R.id.edit_splitby);
-					int split = Integer.parseInt(splitBy.getText().toString());
-
-					BigDecimal totalValue = new BigDecimal(
-							CurrencyStringClean(formatted));
-
-					SplitBill(split, totalValue);
 				} catch (NumberFormatException nfe) {
 					// total.setText("");
 				}
@@ -111,44 +119,61 @@ public class SplitABillActivity extends Activity {
 				TextView serviceChargeTotal = (TextView) findViewById(R.id.service_charge_total);
 
 				Currency currency = Currency.getInstance(Locale.getDefault());
-				String digits = s.toString().replaceAll(String.format("[%s,.]", currency.getSymbol()), "");
-				digits = digits.replaceAll(String.format("[%s,.]", "%"),	"");
+				String digits = s.toString().replaceAll(
+						String.format("[%s,.]", currency.getSymbol()), "");
+				digits = digits.replaceAll(String.format("[%s,.]", "%"), "");
 
 				if (digits.length() <= 0) {
 					return;
 				}
-
+				// format as monetary value
+				NumberFormat nf = NumberFormat.getCurrencyInstance();
 				if (isPercent) {
-					// format value as percent
-					String pctFormated = String.format("%.2f %%", Double.parseDouble(digits));
-					
-					serviceChargeTotal.setText(pctFormated);
-				} else {
-					// format as monetary value
-					NumberFormat nf = NumberFormat.getCurrencyInstance();
-
 					try {
-						String formatted = nf.format(Double.parseDouble(digits) / 100);
+						Double billTotal = getBillTotal();
+						Double serviceChargePercent = Double.parseDouble(digits);
+						Double serviceChargeValue = (serviceChargePercent / 100) * billTotal; 
+						
+						String formatted = nf.format(serviceChargeValue);
 						serviceChargeTotal.setText(formatted);
+						setGrandTotal(currency, serviceChargeValue.toString(), nf);
 					} catch (NumberFormatException nfe) {
 						// total.setText("");
 					}
+				} else {
+					// format value as percent
+					Double billTotal = getBillTotal();
+					Double serviceChargeValue = Double.parseDouble(digits);
+					Double serviceChargePercent;
+					
+					if(billTotal == null || billTotal == 0d)
+					{
+						serviceChargePercent = 0d;
+					}
+					else
+					{
+						serviceChargePercent = (serviceChargeValue / billTotal) * 100;
+					}
+					
+					String pctFormated = String.format("%.2f %%", serviceChargePercent);
+
+					serviceChargeTotal.setText(pctFormated);					
+					setGrandTotal(currency, digits, nf);
 				}
 			}
 
 			@Override
 			public void afterTextChanged(Editable arg0) {
 				// TODO Auto-generated method stub
-
+				
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence arg0, int arg1,
 					int arg2, int arg3) {
 				// TODO Auto-generated method stub
-
+				
 			}
-
 		});
 
 		serviceChargeValue.setText("20"); // set default service charge value
@@ -180,8 +205,8 @@ public class SplitABillActivity extends Activity {
 		TextView splitBy = (TextView) findViewById(R.id.edit_splitby);
 		splitBy.setText(String.format("%02d", splitValue));
 
-		EditText billTotal = (EditText) findViewById(R.id.total_value);
-		String total = billTotal.getText().toString();
+		TextView grandTotal = (TextView) findViewById(R.id.subtotal_value);
+		String total = grandTotal.getText().toString();
 		if (!total.isEmpty()) {
 			BigDecimal totalValue = new BigDecimal(CurrencyStringClean(total));
 			if (totalValue.signum() > 0)
@@ -227,9 +252,9 @@ public class SplitABillActivity extends Activity {
 
 			splitBy.setText(String.format("%02d", split));
 
-			EditText billTotal = (EditText) findViewById(R.id.total_value);
+			TextView grandTotal = (TextView) findViewById(R.id.subtotal_value);
 			BigDecimal totalValue = new BigDecimal(
-					CurrencyStringClean(billTotal.getText().toString()));
+					CurrencyStringClean(grandTotal.getText().toString()));
 			if (totalValue.signum() > 0)
 				SplitBill(split, totalValue);
 		} catch (NumberFormatException nfe) {
@@ -248,9 +273,9 @@ public class SplitABillActivity extends Activity {
 
 			splitBy.setText(String.format("%02d", split));
 
-			EditText billTotal = (EditText) findViewById(R.id.total_value);
+			TextView grandTotal = (TextView) findViewById(R.id.subtotal_value);
 			BigDecimal totalValue = new BigDecimal(
-					CurrencyStringClean(billTotal.getText().toString()));
+					CurrencyStringClean(grandTotal.getText().toString()));
 			if (totalValue.signum() > 0)
 				SplitBill(split, totalValue);
 		} catch (NumberFormatException nfe) {
@@ -277,6 +302,50 @@ public class SplitABillActivity extends Activity {
 			// update UI
 			serviceChargeValue.setText(scValue); // set service charge
 			break;
+		}
+	}
+	
+	private Double getBillTotal() {
+		Currency currency = Currency.getInstance(Locale.getDefault());
+		final EditText total = (EditText) findViewById(R.id.total_value);
+		
+		String sTotal = total.getText().toString().replaceAll(
+				String.format("[%s,.]", currency.getSymbol()), "");
+		sTotal = sTotal.replaceAll(String.format("[%s,.]", "%"), "");
+		
+		if (sTotal.length() <= 0) {
+			return 0d;
+		}
+		else
+		{
+			Double totalValue = Double.parseDouble(sTotal) / 100;
+			return totalValue;
+		}
+	}
+
+	private void setGrandTotal(Currency currency, String serviceCharge,
+			NumberFormat nf) {
+		//set grand total
+		final EditText billTotal = (EditText) findViewById(R.id.total_value);
+		
+		String sTotal = billTotal.getText().toString().replaceAll(
+				String.format("[%s,.]", currency.getSymbol()), "");
+		sTotal = sTotal.replaceAll(String.format("[%s,.]", "%"), "");
+		
+		if (sTotal.length() <= 0) {
+			return;
+		}
+		
+		Double totalValue = Double.parseDouble(sTotal) / 100;
+		Double grandTotal = totalValue + Double.parseDouble(serviceCharge);
+		
+		TextView grandTotalValue = (TextView) findViewById(R.id.subtotal_value);
+		
+		try {
+			String formatted = nf.format(grandTotal);
+			grandTotalValue.setText(formatted);
+		} catch (NumberFormatException nfe) {
+			// total.setText("");
 		}
 	}
 
